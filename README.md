@@ -1,220 +1,326 @@
 # Microservices Project
 
-Este proyecto implementa una arquitectura de microservicios con las siguientes tecnologías:
+Este proyecto implementa una arquitectura de microservicios moderna y escalable, diseñada para demostrar las mejores prácticas en el desarrollo de sistemas distribuidos. La arquitectura está construida con tecnologías de vanguardia y sigue los principios de microservicios, incluyendo service discovery automático, API Gateway centralizado y bases de datos especializadas.
 
-## 🏗️ Arquitectura
+## 🏗️ Arquitectura del Sistema
 
-### Servicios
+### Microservicios
 
-- **Login Service**: Go + Gin + Redis
-- **User Service**: Python + FastAPI + PostgreSQL
-- **Order Service**: Node.js + Express + MongoDB
-- **Frontend**: Angular + Nginx
+El sistema está compuesto por tres microservicios principales, cada uno implementado con tecnologías específicas que aprovechan las fortalezas de cada stack:
 
-### Infraestructura
+- **Login Service**: Implementado en **Go** con el framework **Gin**, utiliza **Redis** como base de datos en memoria para el almacenamiento rápido de sesiones y tokens de autenticación. Este servicio maneja la autenticación y autorización de usuarios.
 
-- **Service Discovery**: Consul
-- **API Gateway**: Traefik
-- **Monitoring**: Prometheus + Grafana
-- **Tracing**: Jaeger
+- **User Service**: Desarrollado en **Python** usando **FastAPI** para su excelente rendimiento y documentación automática, se conecta a **PostgreSQL** para el almacenamiento persistente de datos de usuarios con integridad referencial.
+
+- **Order Service**: Construido con **Node.js** y **Express.js**, utiliza **MongoDB** como base de datos NoSQL para manejar la flexibilidad requerida en el manejo de órdenes y su evolución.
+
+- **Frontend**: Aplicación **Angular** servida a través de **Nginx**, proporcionando una interfaz de usuario moderna y responsiva.
+
+### Infraestructura de Soporte
+
+La infraestructura está diseñada para proporcionar alta disponibilidad, escalabilidad y observabilidad:
+
+- **Service Discovery**: **Consul** actúa como el sistema de descubrimiento de servicios, permitiendo que los microservicios se registren automáticamente y sean descubiertos dinámicamente por otros componentes del sistema.
+
+- **API Gateway**: **Traefik** funciona como el punto de entrada único para todas las peticiones, proporcionando enrutamiento inteligente, balanceamiento de carga, y middlewares de seguridad y CORS.
 
 ## 🚀 Inicio Rápido
 
-### Prerrequisitos
+### Prerrequisitos del Sistema
 
-- Docker
-- Docker Compose
-- Git
+Antes de comenzar, asegúrate de tener instalado en tu sistema:
 
-### Configuración
+- **Docker** (versión 20.10 o superior)
+- **Docker Compose** (versión 2.0 o superior)
+- **Git** (para clonar el repositorio)
+- **Puertos disponibles**: 80, 443, 8080, 8081, 8500, 5432, 6379, 27017
 
-1. **Clonar el repositorio**
+### Configuración del Proyecto
 
-   ```bash
-   git clone <repository-url>
-   cd Project-Software-Engineering
-   ```
-
-2. **Configurar variables de entorno**
-
-   ```bash
-   cp env.example .env
-   # Las credenciales por defecto están configuradas para desarrollo local
-   ```
-
-3. **Levantar toda la infraestructura**
-
-   ```bash
-   docker-compose up -d
-   ```
-
-4. **Verificar servicios**
-
-   ```bash
-   docker-compose ps
-   ```
-
-5. **Ver logs si hay problemas**
-   ```bash
-   docker-compose logs -f
-   ```
-
-> 📋 **Instrucciones detalladas**: Ver [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) para configuración completa
-
-## 📊 Servicios y Puertos
-
-| Servicio          | Puerto | Descripción          |
-| ----------------- | ------ | -------------------- |
-| Frontend          | 4200   | Angular App          |
-| Traefik Dashboard | 8080   | API Gateway UI       |
-| Login Service     | 8080   | Auth API             |
-| User Service      | 8000   | Users API            |
-| Order Service     | 3000   | Orders API           |
-| Consul UI         | 8500   | Service Discovery    |
-| Grafana           | 3001   | Monitoring Dashboard |
-| Prometheus        | 9090   | Metrics              |
-| Jaeger UI         | 16686  | Distributed Tracing  |
-
-## 🗄️ Bases de Datos
-
-| Base de Datos | Puerto | Servicio      |
-| ------------- | ------ | ------------- |
-| Redis         | 6379   | Login Service |
-| PostgreSQL    | 5432   | User Service  |
-| MongoDB       | 27017  | Order Service |
-
-## 🔧 Comandos Útiles
-
-### Levantar servicios individuales
+#### 1. Clonar el Repositorio
 
 ```bash
-# Solo bases de datos
-docker-compose -f docker-compose.databases.yml up -d
-
-# Solo infraestructura
-docker-compose -f docker-compose.infrastructure.yml up -d
-
-# Solo microservicios
-docker-compose -f docker-compose.services.yml up -d
-
-# Solo frontend
-docker-compose -f docker-compose.frontend.yml up -d
+git clone <repository-url>
+cd Project-Software-Engineering
 ```
 
-### Ver logs
+#### 2. Configurar Variables de Entorno
+
+El proyecto utiliza un archivo `.env` para gestionar las configuraciones sensibles y específicas del entorno. Este enfoque permite una fácil configuración entre diferentes ambientes (desarrollo, testing, producción).
 
 ```bash
-# Todos los servicios
+# Copiar el archivo de ejemplo
+cp env.example .env
+
+# Editar las variables según tu entorno
+nano .env  # o tu editor preferido
+```
+
+**¿Por qué usar .env?**
+
+- **Seguridad**: Mantiene las credenciales fuera del código fuente
+- **Flexibilidad**: Permite diferentes configuraciones por entorno
+- **Simplicidad**: Un solo archivo para todas las configuraciones
+- **Docker Integration**: Docker Compose lee automáticamente las variables del archivo .env
+
+#### 3. Levantar la Infraestructura Completa
+
+```bash
+# Levantar todos los servicios en modo detached
+docker-compose up -d
+
+# Verificar que todos los servicios estén ejecutándose
+docker-compose ps
+```
+
+#### 4. Verificar el Estado de los Servicios
+
+```bash
+# Ver el estado de todos los contenedores
+docker-compose ps
+
+# Ver logs en tiempo real si hay problemas
 docker-compose logs -f
 
-# Servicio específico
+# Ver logs de un servicio específico
 docker-compose logs -f login-service
 ```
 
-### Reiniciar servicios
+> 📋 **Nota**: Los servicios pueden tardar unos minutos en estar completamente disponibles debido a los health checks y la inicialización de las bases de datos.
+
+## 📊 Servicios y Puertos
+
+### Microservicios y APIs
+
+| Servicio          | Puerto | Descripción                                  | Acceso Directo           |
+| ----------------- | ------ | -------------------------------------------- | ------------------------ |
+| **API Gateway**   | 80     | Punto de entrada único (Traefik)             | <http://localhost/>      |
+| **Login Service** | 8081   | Servicio de autenticación (Go + Gin + Redis) | <http://localhost:8081/> |
+| **User Service**  | 8000   | Servicio de usuarios (Python + FastAPI)      | <http://localhost:8000/> |
+| **Order Service** | 3000   | Servicio de órdenes (Node.js + Express)      | <http://localhost:3000/> |
+| **Frontend**      | 4200   | Aplicación Angular (Nginx)                   | <http://localhost:4200/> |
+
+### Infraestructura y Dashboards
+
+| Servicio              | Puerto | Descripción                      | URL de Acceso            |
+| --------------------- | ------ | -------------------------------- | ------------------------ |
+| **Traefik Dashboard** | 8080   | Panel de control del API Gateway | <http://localhost:8080/> |
+| **Consul UI**         | 8500   | Interfaz de Service Discovery    | <http://localhost:8500/> |
+
+### Rutas a través del API Gateway
+
+Todas las peticiones a los microservicios deben realizarse a través del API Gateway:
+
+- **Login API**: `http://localhost/login/*`
+- **User API**: `http://localhost/customer/*`
+- **Order API**: `http://localhost/order/*`
+
+## 🗄️ Bases de Datos
+
+El proyecto utiliza tres tipos diferentes de bases de datos, cada una optimizada para el tipo de datos que maneja:
+
+| Base de Datos  | Puerto | Servicio      | Propósito                                         |
+| -------------- | ------ | ------------- | ------------------------------------------------- |
+| **Redis**      | 6379   | Login Service | Almacenamiento en memoria para sesiones y tokens  |
+| **PostgreSQL** | 5432   | User Service  | Base de datos relacional para datos estructurados |
+| **MongoDB**    | 27017  | Order Service | Base de datos NoSQL para datos flexibles          |
+
+### Características de las Bases de Datos
+
+- **Redis**: Proporciona acceso ultra-rápido a datos de sesión y cache, ideal para autenticación
+- **PostgreSQL**: Garantiza integridad referencial y transacciones ACID para datos de usuarios
+- **MongoDB**: Permite esquemas flexibles y escalabilidad horizontal para órdenes complejas
+
+## 🔧 Gestión de Servicios
+
+### Levantar Servicios por Módulos
+
+El proyecto está organizado en módulos Docker Compose separados para facilitar el desarrollo y testing:
 
 ```bash
-# Reiniciar un servicio
-docker-compose restart login-service
+# Solo bases de datos (Redis, PostgreSQL, MongoDB)
+docker-compose -f docker-compose.databases.yml up -d
 
-# Reconstruir y reiniciar
-docker-compose up -d --build login-service
+# Solo infraestructura (Consul, Traefik)
+docker-compose -f docker-compose.infrastructure.yml up -d
+
+# Solo microservicios (Login, User, Order)
+docker-compose -f docker-compose.services.yml up -d
+
+# Solo frontend (Angular + Nginx)
+docker-compose -f docker-compose.frontend.yml up -d
 ```
 
-### Limpiar todo
+### Monitoreo y Logs
 
 ```bash
-# Parar y eliminar contenedores
+# Ver logs de todos los servicios en tiempo real
+docker-compose logs -f
+
+# Ver logs de un servicio específico
+docker-compose logs -f login-service
+docker-compose logs -f traefik
+docker-compose logs -f consul
+
+# Ver logs con timestamps
+docker-compose logs -f -t
+```
+
+### Gestión del Ciclo de Vida
+
+```bash
+# Reiniciar un servicio específico
+docker-compose restart login-service
+
+# Reconstruir y reiniciar (útil durante desarrollo)
+docker-compose up -d --build login-service
+
+# Parar todos los servicios
 docker-compose down
 
-# Eliminar también volúmenes
+# Parar y eliminar volúmenes (¡CUIDADO: elimina datos!)
 docker-compose down -v
 
-# Eliminar imágenes también
+# Limpieza completa (elimina contenedores, volúmenes e imágenes)
 docker-compose down -v --rmi all
 ```
 
-## 🏥 Health Checks
+## 🏥 Health Checks y Monitoreo
 
-Todos los servicios incluyen health checks. Puedes verificar el estado con:
+### Verificación del Estado de los Servicios
+
+Todos los servicios incluyen health checks automáticos que verifican su disponibilidad:
 
 ```bash
 # Estado de todos los servicios
 docker-compose ps
 
-# Health check específico
-curl http://localhost:8080/health  # Login Service
-curl http://localhost:8000/health  # User Service
-curl http://localhost:3000/health  # Order Service
-curl http://localhost:4200/health  # Frontend
+# Health checks específicos a través del API Gateway
+curl http://localhost/login/health     # Login Service
+curl http://localhost/customer/health  # User Service
+curl http://localhost/order/health     # Order Service
+
+# Health checks directos (para debugging)
+curl http://localhost:8081/health      # Login Service directo
+curl http://localhost:8000/health      # User Service directo
+curl http://localhost:3000/health      # Order Service directo
 ```
 
-## 🔍 Monitoreo
+### Dashboards de Monitoreo
 
-### Grafana
+#### Traefik Dashboard
 
-- URL: http://localhost:3001
-- Usuario: admin
-- Contraseña: admin (configurable en .env)
+- **URL**: <http://localhost:8080>
+- **Propósito**: Monitorear el tráfico, rutas y estado de los servicios
+- **Características**:
+  - Visualización de servicios registrados
+  - Métricas de tráfico en tiempo real
+  - Estado de health checks
+  - Configuración de middlewares
 
-### Prometheus
+#### Consul UI
 
-- URL: http://localhost:9090
+- **URL**: <http://localhost:8500>
+- **Propósito**: Gestionar el service discovery y la configuración
+- **Características**:
+  - Lista de servicios registrados
+  - Estado de salud de los servicios
+  - Configuración de key-value store
+  - Visualización de nodos del cluster
 
-### Jaeger
-
-- URL: http://localhost:16686
-
-### Consul
-
-- URL: http://localhost:8500
-
-## 🛠️ Desarrollo
+## 🛠️ Desarrollo y Configuración
 
 ### Estructura del Proyecto
 
+El proyecto está organizado siguiendo las mejores prácticas de microservicios con una estructura modular y escalable:
+
 ```
 Project-Software-Engineering/
-├── consul/                 # Configuración de Consul
-├── traefik/               # Configuración de Traefik
-├── prometheus/            # Configuración de Prometheus
-├── grafana/               # Configuración de Grafana
-├── postgres/              # Scripts de inicialización de PostgreSQL
-├── mongodb/               # Scripts de inicialización de MongoDB
-├── frontend/              # Aplicación Angular
-├── login-service/         # Servicio de autenticación (Go)
-├── user-service/          # Servicio de usuarios (Python)
-├── order-service/         # Servicio de órdenes (Node.js)
-├── docker-compose.yml     # Orquestación principal
-└── README.md
+├── consul/                    # Configuración de Consul
+│   └── consul.json           # Configuración del cluster Consul
+├── traefik/                  # Configuración de Traefik
+│   ├── traefik.yml           # Configuración principal del API Gateway
+│   └── dynamic.yml           # Configuración dinámica de rutas y middlewares
+├── postgres/                 # Scripts de inicialización de PostgreSQL
+│   └── init.sql              # Script de creación de tablas
+├── mongodb/                  # Scripts de inicialización de MongoDB
+│   └── init-mongo.js         # Script de creación de colecciones
+├── frontend/                 # Aplicación Angular
+│   ├── Dockerfile            # Imagen del frontend
+│   └── nginx.conf            # Configuración de Nginx
+├── login-service/            # Servicio de autenticación (Go + Gin + Redis)
+│   ├── internal/             # Código interno del servicio
+│   ├── pkg/                  # Paquetes compartidos
+│   ├── api/                  # Documentación OpenAPI
+│   ├── Dockerfile            # Imagen del servicio
+│   └── go.mod                # Dependencias Go
+├── user-service/             # Servicio de usuarios (Python + FastAPI + PostgreSQL)
+├── order-service/            # Servicio de órdenes (Node.js + Express + MongoDB)
+├── docker-compose.yml        # Orquestación principal
+├── docker-compose.*.yml      # Archivos de composición modulares
+├── env.example               # Plantilla de variables de entorno
+└── README.md                 # Documentación del proyecto
 ```
 
-### Agregar un nuevo servicio
+### Configuración de Infraestructura
 
-1. Crear directorio del servicio
-2. Agregar Dockerfile
-3. Actualizar docker-compose.yml
-4. Configurar Traefik labels
-5. Agregar health checks
+#### Consul (Service Discovery)
 
-## 🔒 Seguridad
+La carpeta `consul/` contiene la configuración del cluster de Consul:
 
-- Todos los contenedores corren como usuarios no-root
-- Variables de entorno para credenciales sensibles
-- Headers de seguridad configurados en Traefik
-- CORS configurado para desarrollo
+- **`consul.json`**: Define la configuración del servidor Consul, incluyendo puertos, configuración de red y opciones de clustering
+- **Propósito**: Permite el registro automático de servicios y su descubrimiento dinámico
 
-## 📝 Notas
+#### Traefik (API Gateway)
 
-- Los puertos están configurados para desarrollo local
-- Para producción, cambiar puertos y configuraciones de seguridad
-- Los health checks pueden tardar unos minutos en pasar al inicio
-- Las bases de datos persisten datos en volúmenes Docker
+La carpeta `traefik/` contiene toda la configuración del API Gateway:
 
-## 🤝 Contribución
+- **`traefik.yml`**: Configuración principal que define providers (Consul, archivos), entrypoints y logging
+- **`dynamic.yml`**: Configuración dinámica que define rutas, middlewares (CORS, rate limiting, security headers) y servicios
+- **Propósito**: Centraliza el enrutamiento, balanceamiento de carga y aplica middlewares de seguridad
 
-1. Fork el proyecto
-2. Crear una rama para tu feature
-3. Commit tus cambios
-4. Push a la rama
-5. Abrir un Pull Request
+### Gestión de Variables de Entorno
+
+El archivo `.env` es fundamental para la configuración del proyecto:
+
+```bash
+# Ejemplo de variables importantes
+REDIS_PASSWORD=redis_password_123
+POSTGRES_PASSWORD=postgres_password_123
+MONGO_ROOT_PASSWORD=mongo_password_123
+```
+
+**Ventajas del enfoque .env:**
+
+- **Configuración centralizada**: Un solo lugar para todas las variables
+- **Seguridad**: Las credenciales no están en el código
+- **Flexibilidad**: Diferentes configuraciones por entorno
+- **Docker Integration**: Docker Compose lee automáticamente estas variables
+
+### Agregar un Nuevo Microservicio
+
+Para agregar un nuevo microservicio al proyecto:
+
+1. **Crear estructura del servicio** siguiendo las convenciones del framework
+2. **Agregar Dockerfile** optimizado para el lenguaje/framework
+3. **Actualizar docker-compose.services.yml** con la nueva definición
+4. **Configurar Traefik labels** para el enrutamiento
+5. **Implementar health checks** para monitoreo
+6. **Registrar en Consul** para service discovery automático
+
+## 🔒 Seguridad y Mejores Prácticas
+
+### Medidas de Seguridad Implementadas
+
+- **Contenedores no-root**: Todos los servicios ejecutan con usuarios no privilegiados
+- **Gestión de secretos**: Credenciales sensibles manejadas a través de variables de entorno
+- **Headers de seguridad**: Configurados en Traefik (X-Frame-Options, X-Content-Type-Options, etc.)
+- **CORS configurado**: Políticas de CORS definidas para desarrollo y producción
+- **Rate limiting**: Protección contra ataques de fuerza bruta implementada en Traefik
+
+### Consideraciones de Producción
+
+- **Cambiar credenciales por defecto**: Las credenciales en `.env` son solo para desarrollo
+- **Configurar HTTPS**: Implementar certificados SSL/TLS para producción
+- **Firewall**: Configurar reglas de firewall apropiadas
+- **Monitoreo**: Implementar logging y alertas para producción
