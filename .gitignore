@@ -1,0 +1,376 @@
+# ===========================================
+# GITIGNORE PARA PROYECTO DE MICROSERVICIOS
+# ===========================================
+# Este archivo ignora archivos y directorios comunes
+# para todos los microservicios del proyecto
+
+# ===========================================
+# ARCHIVOS DE CONFIGURACIÓN SENSIBLES
+# ===========================================
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+config.local.*
+secrets.json
+credentials.json
+
+# ===========================================
+# LOGS Y ARCHIVOS TEMPORALES
+# ===========================================
+*.log
+logs/
+log/
+*.tmp
+*.temp
+.tmp/
+temp/
+
+# ===========================================
+# DIRECTORIOS DE DEPENDENCIAS
+# ===========================================
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Go
+vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+
+# ===========================================
+# DIRECTORIOS DE BUILD Y COMPILACIÓN
+# ===========================================
+# General
+build/
+dist/
+out/
+target/
+bin/
+obj/
+
+# Frontend (Angular/React/Vue)
+.next/
+.nuxt/
+.vuepress/dist
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+
+# ===========================================
+# ARCHIVOS DE IDE Y EDITORES
+# ===========================================
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ===========================================
+# SISTEMAS OPERATIVOS
+# ===========================================
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===========================================
+# DOCKER Y CONTAINERS
+# ===========================================
+# Docker
+.dockerignore
+docker-compose.override.yml
+docker-compose.local.yml
+
+# ===========================================
+# BASES DE DATOS
+# ===========================================
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+
+# PostgreSQL
+*.dump
+*.sql
+
+# MongoDB
+*.bson
+
+# ===========================================
+# TESTING Y COVERAGE
+# ===========================================
+# Coverage reports
+coverage/
+*.lcov
+.nyc_output
+.coverage
+htmlcov/
+.pytest_cache/
+.coverage.*
+
+# Test results
+test-results/
+junit.xml
+test-report.xml
+
+# ===========================================
+# CACHÉ Y TEMPORALES
+# ===========================================
+# General cache
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# TypeScript
+*.tsbuildinfo
+
+# ===========================================
+# DOCUMENTACIÓN GENERADA
+# ===========================================
+# Generated docs
+docs/generated/
+api-docs/
+swagger-ui/
+
+# ===========================================
+# ARCHIVOS DE DESARROLLO
+# ===========================================
+# Scripts de desarrollo local
+dev-local.*
+start-local.*
+local-setup.*
+
+# Archivos de configuración local
+local.*
+dev.*
+test.*
+
+# ===========================================
+# ARCHIVOS DE DEPLOYMENT
+# ===========================================
+# Kubernetes
+k8s-secrets/
+*.secret.yaml
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# ===========================================
+# ARCHIVOS ESPECÍFICOS DEL PROYECTO
+# ===========================================
+# Logs específicos
+microservices.log
+gateway.log
+service-discovery.log
+
+# Archivos de backup
+*.backup
+*.bak
+*.old
+
+# Archivos de configuración temporal
+config.tmp
+settings.tmp
+
+# ===========================================
+# ARCHIVOS DE MONITOREO
+# ===========================================
+# Prometheus
+prometheus_data/
+grafana_data/
+
+# Jaeger
+jaeger_data/
+
+# ===========================================
+# ARCHIVOS DE DESARROLLO FRONTEND
+# ===========================================
+# Angular
+.angular/
+dist/
+
+# React
+build/
+
+# Vue
+dist/
+
+# ===========================================
+# ARCHIVOS DE DESARROLLO BACKEND
+# ===========================================
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.egg-info/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===========================================
+# ARCHIVOS DE CONFIGURACIÓN ESPECÍFICOS
+# ===========================================
+# Traefik
+traefik.log
+
+# Consul
+consul.log
+
+# Redis
+dump.rdb
+
+# ===========================================
+# ARCHIVOS DE DESARROLLO LOCAL
+# ===========================================
+# Archivos de desarrollo local
+local.env
+dev.env
+test.env
+
+# Scripts de desarrollo
+dev-*.sh
+dev-*.bat
+local-*.sh
+local-*.bat
+
+# ===========================================
+# ARCHIVOS DE CONFIGURACIÓN TEMPORAL
+# ===========================================
+# Archivos de configuración temporal
+*.tmp.yml
+*.tmp.yaml
+*.tmp.json
+*.tmp.xml
+
+# ===========================================
+# ARCHIVOS DE LOGS ESPECÍFICOS
+# ===========================================
+# Logs de servicios
+login-service.log
+user-service.log
+order-service.log
+frontend.log
+
+# Logs de infraestructura
+redis.log
+postgres.log
+mongodb.log
+consul.log
+traefik.log
