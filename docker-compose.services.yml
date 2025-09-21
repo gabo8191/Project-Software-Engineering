@@ -1,0 +1,94 @@
+services:
+  # Login Service (Go + Gin + Redis)
+  login-service:
+    build:
+      context: ./login-service
+      dockerfile: Dockerfile
+    container_name: login-service
+    restart: unless-stopped
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis_password_123}
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - SERVICE_NAME=login-service
+      - SERVICE_PORT=8081
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.login-service.rule=PathPrefix(`/login`)"
+      - "traefik.http.routers.login-service.service=login-service"
+      - "traefik.http.services.login-service.loadbalancer.server.port=8081"
+      - "consul.service.name=login-service"
+      - "consul.service.port=8081"
+      - "consul.service.tags=login,api,microservice"
+    ports:
+      - "8081:8081"
+    networks:
+      - microservices-network
+    depends_on:
+      consul:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # User Service (Python + FastAPI + PostgreSQL)
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres_user}:${POSTGRES_PASSWORD:-postgres_password_123}@postgres:5432/${POSTGRES_DB:-customerdb}
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - SERVICE_NAME=user-service
+      - SERVICE_PORT=8000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.user-service.rule=PathPrefix(`/customer`)"
+      - "traefik.http.routers.user-service.service=user-service"
+      - "traefik.http.services.user-service.loadbalancer.server.port=8000"
+    ports:
+      - "8000:8000"
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Order Service (Node.js + Express + MongoDB)
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    restart: unless-stopped
+    environment:
+      - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-mongo_admin}:${MONGO_ROOT_PASSWORD:-mongo_password_123}@mongodb:27017/${MONGO_DATABASE:-OrderDB}?authSource=admin
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - SERVICE_NAME=order-service
+      - SERVICE_PORT=3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.order-service.rule=PathPrefix(`/order`)"
+      - "traefik.http.routers.order-service.service=order-service"
+      - "traefik.http.services.order-service.loadbalancer.server.port=3000"
+    ports:
+      - "3000:3000"
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
