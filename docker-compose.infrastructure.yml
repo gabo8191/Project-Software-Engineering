@@ -1,0 +1,59 @@
+services:
+  # Consul for Service Discovery
+  consul:
+    image: consul:1.14
+    container_name: consul
+    restart: unless-stopped
+    ports:
+      - "8500:8500"
+      - "8501:8501"
+    volumes:
+      - consul_data:/consul/data
+      - ./consul/consul.json:/consul/config/consul.json:ro
+    networks:
+      - microservices-network
+    command: consul agent -server -bootstrap-expect=1 -ui -config-dir=/consul/config -client=0.0.0.0
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Traefik API Gateway
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"  # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    networks:
+      - microservices-network
+    depends_on:
+      consul:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.entrypoints=web"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
+
+volumes:
+  consul_data:
+    driver: local
+
+networks:
+  microservices-network:
+    driver: bridge
