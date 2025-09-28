@@ -57,11 +57,11 @@ services:
   #     file: docker-compose.services.yml
   #     service: user-service
 
-  # Order Service (Node.js + Express + MongoDB) - NOT READY YET
-  # order-service:
-  #   extends:
-  #     file: docker-compose.services.yml
-  #     service: order-service
+  # Order Service (Node.js + Express + MongoDB) - READY ✅
+  order-service:
+    extends:
+      file: docker-compose.services.yml
+      service: order-service
 
   # ===========================================
   # FRONTEND
