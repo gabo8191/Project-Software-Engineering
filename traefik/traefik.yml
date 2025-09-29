@@ -14,7 +14,7 @@ providers:
   docker:
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
-    network: microservices-network
+    network: project-software-engineering_microservices-network
 
   file:
     filename: /etc/traefik/dynamic.yml

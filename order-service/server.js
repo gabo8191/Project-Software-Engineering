@@ -24,7 +24,7 @@ const rateLimit = require('express-rate-limit');
 // Import configuration and services
 const config = require('./src/config/environment');
 const database = require('./src/config/database');
-const consulService = require('./src/services/consulService.simple');
+const consulService = require('./src/services/consulService');
 const errorHandler = require('./src/middleware/errorHandler');
 const setupRoutes = require('./src/routes');
 

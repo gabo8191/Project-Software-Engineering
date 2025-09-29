@@ -1,23 +1,19 @@
-const consul = require('consul');
+const http = require('http');
 const config = require('../config/environment');
 
 /**
  * Consul Service Discovery integration
- * Handles service registration and health checks with Consul
+ * Handles service registration and health checks with Consul using HTTP API
  */
 class ConsulService {
   constructor() {
-    this.consul = consul({
-      host: config.consul.host,
-      port: config.consul.port,
-      secure: false
-    });
-    
+    this.consulHost = config.consul.host;
+    this.consulPort = config.consul.port;
     this.serviceId = `${config.consul.serviceName}-${Date.now()}`;
     this.isRegistered = false;
     
     console.log('🔍 Consul service initialized');
-    console.log(`📍 Consul address: ${config.consul.host}:${config.consul.port}`);
+    console.log(`📍 Consul address: ${this.consulHost}:${this.consulPort}`);
     console.log(`🏷️  Service ID: ${this.serviceId}`);
   }
 
@@ -32,8 +28,8 @@ class ConsulService {
     
     for (let i = 0; i < maxRetries; i++) {
       try {
-        const leader = await this.consul.status.leader();
-        console.log(`✅ Consul is available (leader: ${leader})`);
+        await this.makeHttpRequest('GET', '/v1/status/leader');
+        console.log(`✅ Consul is available`);
         return;
       } catch (error) {
         console.log(`⏳ Consul not available, retry ${i + 1}/${maxRetries} (${error.message})`);
@@ -56,26 +52,26 @@ class ConsulService {
       console.log('📝 Registering service with Consul...');
 
       const registration = {
-        id: this.serviceId,
-        name: config.consul.serviceName,
-        address: config.consul.serviceHost,
-        port: config.consul.servicePort,
-        tags: config.consul.tags,
-        meta: {
+        ID: this.serviceId,
+        Name: config.consul.serviceName,
+        Address: config.consul.serviceHost,
+        Port: config.consul.servicePort,
+        Tags: config.consul.tags,
+        Meta: {
           version: '1.0.0',
           framework: 'express',
           database: 'mongodb',
           language: 'nodejs'
         },
-        check: {
-          http: `http://${config.consul.serviceHost}:${config.consul.servicePort}${config.consul.healthCheckPath}`,
-          interval: '10s',
-          timeout: '5s',
-          deregistercriticalserviceafter: '30s'
+        Check: {
+          HTTP: `http://${config.consul.serviceHost}:${config.consul.servicePort}${config.consul.healthCheckPath}`,
+          Interval: '10s',
+          Timeout: '5s',
+          DeregisterCriticalServiceAfter: '30s'
         }
       };
 
-      await this.consul.agent.service.register(registration);
+      await this.makeHttpRequest('PUT', '/v1/agent/service/register', registration);
       this.isRegistered = true;
       
       console.log('✅ Service registered successfully with Consul');
@@ -93,6 +89,57 @@ class ConsulService {
   }
 
   /**
+   * Make HTTP request to Consul API
+   * @param {string} method - HTTP method
+   * @param {string} path - API path
+   * @param {Object} data - Request body data
+   * @returns {Promise<any>}
+   */
+  async makeHttpRequest(method, path, data = null) {
+    return new Promise((resolve, reject) => {
+      const options = {
+        hostname: this.consulHost,
+        port: this.consulPort,
+        path: path,
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+
+      const req = http.request(options, (res) => {
+        let body = '';
+        res.on('data', (chunk) => {
+          body += chunk;
+        });
+
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            try {
+              const result = body ? JSON.parse(body) : null;
+              resolve(result);
+            } catch (e) {
+              resolve(body);
+            }
+          } else {
+            reject(new Error(`HTTP ${res.statusCode}: ${body}`));
+          }
+        });
+      });
+
+      req.on('error', (error) => {
+        reject(error);
+      });
+
+      if (data) {
+        req.write(JSON.stringify(data));
+      }
+
+      req.end();
+    });
+  }
+
+  /**
    * Deregister service from Consul
    * @returns {Promise<void>}
    */
@@ -105,7 +152,7 @@ class ConsulService {
 
       console.log('📤 Deregistering service from Consul...');
       
-      await this.consul.agent.service.deregister(this.serviceId);
+      await this.makeHttpRequest('PUT', `/v1/agent/service/deregister/${this.serviceId}`);
       this.isRegistered = false;
       
       console.log('✅ Service deregistered successfully from Consul');
@@ -123,10 +170,7 @@ class ConsulService {
    */
   async getServiceHealth(serviceName) {
     try {
-      const services = await this.consul.health.service({
-        service: serviceName,
-        passing: true
-      });
+      const services = await this.makeHttpRequest('GET', `/v1/health/service/${serviceName}?passing=true`);
 
       return services.map(service => ({
         id: service.Service.ID,
@@ -153,9 +197,7 @@ class ConsulService {
    */
   async discoverService(serviceName) {
     try {
-      const services = await this.consul.catalog.service.nodes({
-        service: serviceName
-      });
+      const services = await this.makeHttpRequest('GET', `/v1/catalog/service/${serviceName}`);
 
       return services.map(service => ({
         id: service.ServiceID,
