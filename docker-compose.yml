@@ -51,11 +51,11 @@ services:
       file: docker-compose.services.yml
       service: login-service
 
-  # User Service (Python + FastAPI + PostgreSQL) - NOT READY YET
-  # user-service:
-  #   extends:
-  #     file: docker-compose.services.yml
-  #     service: user-service
+  # User Service (Python + FastAPI + PostgreSQL) - READY ✅
+  user-service:
+    extends:
+      file: docker-compose.services.yml
+      service: user-service
 
   # Order Service (Node.js + Express + MongoDB) - READY ✅
   order-service:

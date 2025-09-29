@@ -11,11 +11,10 @@ entryPoints:
     address: ':443'
 
 providers:
-  consul:
-    endpoints:
-      - 'consul:8500'
-    prefix: 'traefik'
-    watch: true
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: microservices-network
 
   file:
     filename: /etc/traefik/dynamic.yml
