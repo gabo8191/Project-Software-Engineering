@@ -84,7 +84,7 @@ func setupRouter(authHandler *handlers.AuthHandler, healthHandler *handlers.Heal
 	router.Use(middleware.Logger(logger))
 	router.Use(middleware.Recovery(logger))
 
-	// Health check endpoints
+	// Health check endpoints (root level for direct access)
 	router.GET("/health", healthHandler.HealthCheck)
 	router.GET("/ready", healthHandler.ReadinessCheck)
 	router.GET("/live", healthHandler.LivenessCheck)
@@ -92,6 +92,12 @@ func setupRouter(authHandler *handlers.AuthHandler, healthHandler *handlers.Heal
 	// API routes
 	api := router.Group("/login")
 	{
+		// Health endpoints under /login prefix (for API Gateway)
+		api.GET("/health", healthHandler.HealthCheck)
+		api.GET("/ready", healthHandler.ReadinessCheck)
+		api.GET("/live", healthHandler.LivenessCheck)
+
+		// Authentication endpoints
 		api.POST("/createuser", authHandler.CreateUser)
 		api.POST("/authuser", authHandler.AuthUser)
 	}

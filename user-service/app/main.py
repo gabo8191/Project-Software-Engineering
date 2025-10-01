@@ -2,10 +2,10 @@
 FastAPI main application
 User Service - Customer Management Microservice
 """
+
 import logging
-import asyncio
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
@@ -18,7 +18,7 @@ from app.utils.consul import register_with_consul, deregister_from_consul
 # Configure logging
 logging.basicConfig(
     level=getattr(logging, settings.LOG_LEVEL.upper()),
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -31,30 +31,30 @@ async def lifespan(app: FastAPI):
     """
     # Startup
     logger.info("Starting User Service...")
-    
+
     try:
         # Create database tables
         logger.info("Creating database tables...")
         create_tables()
-        
+
         # Check database connection
         logger.info("Checking database connection...")
         if not check_database_connection():
             logger.error("Database connection failed!")
             raise Exception("Database connection failed")
-        
+
         # Register with Consul
         logger.info("Registering with Consul...")
         await register_with_consul()
-        
+
         logger.info("User Service started successfully!")
-        
+
     except Exception as e:
         logger.error(f"Failed to start User Service: {e}")
         raise
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down User Service...")
     try:
@@ -73,7 +73,7 @@ app = FastAPI(
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/openapi.json"
+    openapi_url="/openapi.json",
 )
 
 # Add CORS middleware
@@ -97,23 +97,18 @@ async def global_exception_handler(request, exc):
         status_code=500,
         content={
             "error": "Internal server error",
-            "message": "An unexpected error occurred"
-        }
+            "message": "An unexpected error occurred",
+        },
     )
 
 
 # Include routers
-app.include_router(
-    health.router,
-    prefix="/health",
-    tags=["Health"]
-)
+app.include_router(health.router, tags=["Health"])
 
-app.include_router(
-    customer.router,
-    prefix="/customer",
-    tags=["Customer"]
-)
+app.include_router(customer.router, prefix="/customer", tags=["Customer"])
+
+# Include health endpoints under /customer prefix for API Gateway
+app.include_router(health.router, prefix="/customer", tags=["Health-Customer"])
 
 
 # Root endpoint
@@ -128,8 +123,9 @@ async def root():
         "status": "running",
         "message": "User Service is running",
         "docs": "/docs",
-        "health": "/health"
+        "health": "/health",
     }
+
 
 # Direct health endpoint for Consul
 @app.get("/health")
@@ -141,8 +137,9 @@ async def direct_health_check():
         "status": "healthy",
         "service": settings.SERVICE_NAME,
         "version": settings.VERSION,
-        "message": "User Service is running"
+        "message": "User Service is running",
     }
+
 
 # Service info endpoint
 @app.get("/info")
@@ -166,8 +163,8 @@ async def service_info():
             "get_customer_by_email": "GET /customer/customerbyemail/{email}",
             "health": "GET /health/health",
             "ready": "GET /health/ready",
-            "live": "GET /health/live"
-        }
+            "live": "GET /health/live",
+        },
     }
 
 
@@ -178,6 +175,5 @@ if __name__ == "__main__":
         host=settings.SERVICE_HOST,
         port=settings.SERVICE_PORT,
         reload=True,
-        log_level=settings.LOG_LEVEL.lower()
+        log_level=settings.LOG_LEVEL.lower(),
     )
-

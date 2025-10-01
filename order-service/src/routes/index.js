@@ -14,35 +14,39 @@ const setupRoutes = (app) => {
   // ========================================
   // HEALTH CHECK ROUTES (root level)
   // ========================================
-  
-  // Mount health routes at root level for easy access
+
+  // Mount health routes at root level for direct access
   app.use('/', healthRoutes);
 
   // ========================================
   // ORDER SERVICE ROUTES
   // ========================================
-  
+
+  // Mount health routes under /order prefix FIRST (before parameterized routes)
+  app.use('/order', healthRoutes);
+
   // Mount order routes with /order prefix to match API specification
   app.use('/order', orderRoutes);
 
   // ========================================
   // ROOT ENDPOINT
   // ========================================
-  
+
   // Root endpoint with service information
   app.get('/', (req, res) => {
     res.json({
       service: 'Order Management Microservice',
       version: '1.0.0',
-      description: 'Node.js + Express + MongoDB microservice for order management',
+      description:
+        'Node.js + Express + MongoDB microservice for order management',
       author: 'Software Engineering Team',
       endpoints: {
         health: {
           '/health': 'Basic health check',
           '/ready': 'Readiness probe',
-          '/live': 'Liveness probe', 
+          '/live': 'Liveness probe',
           '/status': 'Detailed service status',
-          '/ping': 'Simple ping'
+          '/ping': 'Simple ping',
         },
         orders: {
           'POST /order/createorder': 'Create new order',
@@ -50,21 +54,21 @@ const setupRoutes = (app) => {
           'GET /order/findorderbycustomerid': 'Find orders by customer ID',
           'GET /order/all': 'Get all orders (paginated)',
           'GET /order/stats': 'Get order statistics',
-          'GET /order/:orderID': 'Get order by ID'
-        }
+          'GET /order/:orderID': 'Get order by ID',
+        },
       },
       documentation: {
         swagger: '/api-docs',
-        postman: 'Available on request'
+        postman: 'Available on request',
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   });
 
   // ========================================
   // API DOCUMENTATION (if Swagger is added later)
   // ========================================
-  
+
   // Placeholder for Swagger documentation
   app.get('/api-docs', (req, res) => {
     res.json({
@@ -77,30 +81,30 @@ const setupRoutes = (app) => {
           path: '/order/createorder',
           description: 'Create a new order',
           parameters: ['customerid', 'orderID (optional)', 'status (optional)'],
-          returns: '{ orderCreated: boolean }'
+          returns: '{ orderCreated: boolean }',
         },
         {
-          method: 'PUT', 
+          method: 'PUT',
           path: '/order/updateorderstatus',
           description: 'Update order status',
           parameters: ['orderID', 'status'],
-          returns: '{ orderStatusUpdated: boolean }'
+          returns: '{ orderStatusUpdated: boolean }',
         },
         {
           method: 'GET',
           path: '/order/findorderbycustomerid',
           description: 'Find orders by customer ID',
           parameters: ['customerid (query)'],
-          returns: '[{ customerid, orderID, status }]'
-        }
-      ]
+          returns: '[{ customerid, orderID, status }]',
+        },
+      ],
     });
   });
 
   // ========================================
   // CATCH ALL - 404 HANDLER
   // ========================================
-  
+
   // Handle all undefined routes
   app.use('*', (req, res) => {
     res.status(404).json({
@@ -110,7 +114,7 @@ const setupRoutes = (app) => {
       availableEndpoints: [
         'GET /',
         'GET /health',
-        'GET /ready', 
+        'GET /ready',
         'GET /live',
         'GET /status',
         'GET /ping',
@@ -119,9 +123,9 @@ const setupRoutes = (app) => {
         'GET /order/findorderbycustomerid',
         'GET /order/all',
         'GET /order/stats',
-        'GET /order/:orderID'
+        'GET /order/:orderID',
       ],
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   });
 

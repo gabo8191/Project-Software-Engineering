@@ -94,7 +94,7 @@ docker-compose logs -f login-service
 
 | Servicio          | Puerto | Descripción                                  | Acceso Directo           |
 | ----------------- | ------ | -------------------------------------------- | ------------------------ |
-| **API Gateway**   | 80     | Punto de entrada único (Traefik)             | <http://localhost/>      |
+| **API Gateway**   | 8090   | Punto de entrada único (Traefik)             | <http://localhost:8090/> |
 | **Login Service** | 8081   | Servicio de autenticación (Go + Gin + Redis) | <http://localhost:8081/> |
 | **User Service**  | 8000   | Servicio de usuarios (Python + FastAPI)      | <http://localhost:8000/> |
 | **Order Service** | 3000   | Servicio de órdenes (Node.js + Express)      | <http://localhost:3000/> |
@@ -111,9 +111,9 @@ docker-compose logs -f login-service
 
 Todas las peticiones a los microservicios deben realizarse a través del API Gateway:
 
-- **Login API**: `http://localhost/login/*`
-- **User API**: `http://localhost/customer/*`
-- **Order API**: `http://localhost/order/*`
+- **Login API**: `http://localhost:8090/login/*`
+- **User API**: `http://localhost:8090/customer/*`
+- **Order API**: `http://localhost:8090/order/*`
 
 ## 🗄️ Bases de Datos
 
@@ -196,9 +196,9 @@ Todos los servicios incluyen health checks automáticos que verifican su disponi
 docker-compose ps
 
 # Health checks específicos a través del API Gateway
-curl http://localhost/login/health     # Login Service
-curl http://localhost/customer/health  # User Service
-curl http://localhost/order/health     # Order Service
+curl http://localhost:8090/login/health     # Login Service
+curl http://localhost:8090/customer/health  # User Service
+curl http://localhost:8090/order/health     # Order Service
 
 # Health checks directos (para debugging)
 curl http://localhost:8081/health      # Login Service directo
