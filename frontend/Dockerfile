@@ -13,8 +13,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the Angular application
-RUN npm run build --prod
+# Build the React application
+RUN npm run build
 
 # Final stage
 FROM nginx:alpine
@@ -22,7 +22,7 @@ FROM nginx:alpine
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copy built Angular app from builder stage
+# Copy built React app from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Create non-root user
