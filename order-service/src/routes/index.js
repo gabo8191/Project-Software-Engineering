@@ -22,10 +22,10 @@ const setupRoutes = (app) => {
   // ORDER SERVICE ROUTES
   // ========================================
 
-  // Mount health routes under /order prefix FIRST (before parameterized routes)
+  // Mount health routes under /order prefix FIRST (before other routes)
   app.use('/order', healthRoutes);
 
-  // Mount order routes with /order prefix to match API specification
+  // Mount order routes with /order prefix but without the catch-all route conflict
   app.use('/order', orderRoutes);
 
   // ========================================
@@ -115,9 +115,14 @@ const setupRoutes = (app) => {
         'GET /',
         'GET /health',
         'GET /ready',
-        'GET /live',
+        'GET /live', 
         'GET /status',
         'GET /ping',
+        'GET /order/health',
+        'GET /order/ready', 
+        'GET /order/live',
+        'GET /order/status',
+        'GET /order/ping',
         'POST /order/createorder',
         'PUT /order/updateorderstatus',
         'GET /order/findorderbycustomerid',

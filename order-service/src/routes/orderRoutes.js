@@ -88,20 +88,7 @@ router.get('/:orderID', orderController.getOrderByID);
 // ERROR HANDLING
 // ========================================
 
-// Handle 404 for undefined routes within /order
-router.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: `Route ${req.originalUrl} not found in Order Service`,
-    availableRoutes: [
-      'POST /order/createorder',
-      'PUT /order/updateorderstatus',
-      'GET /order/findorderbycustomerid?customerid=<ID>',
-      'GET /order/all',
-      'GET /order/stats',
-      'GET /order/:orderID'
-    ]
-  });
-});
+// NOTE: Catch-all route removed to prevent interference with health routes
+// The main index.js file handles 404 errors with its own catch-all
 
 module.exports = router;

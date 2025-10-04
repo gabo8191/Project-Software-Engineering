@@ -15,10 +15,7 @@ services:
       - SERVICE_NAME=login-service
       - SERVICE_PORT=8081
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.login-service.rule=PathPrefix(`/login`)"
-      - "traefik.http.routers.login-service.service=login-service"
-      - "traefik.http.services.login-service.loadbalancer.server.port=8081"
+      - "traefik.enable=false"
       - "consul.service.name=login-service"
       - "consul.service.port=8081"
       - "consul.service.tags=login,api,microservice"
@@ -51,10 +48,7 @@ services:
       - SERVICE_NAME=user-service
       - SERVICE_PORT=8000
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.user-service.rule=PathPrefix(`/customer`)"
-      - "traefik.http.routers.user-service.service=user-service"
-      - "traefik.http.services.user-service.loadbalancer.server.port=8000"
+      - "traefik.enable=false"
     ports:
       - "8000:8000"
     networks:
@@ -79,11 +73,7 @@ services:
       - SERVICE_NAME=order-service
       - SERVICE_PORT=3000
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.order-service.rule=PathPrefix(`/order`)"
-      - "traefik.http.routers.order-service.service=order-service"
-      - "traefik.http.services.order-service.loadbalancer.server.port=3000"
-      - "traefik.docker.network=project-software-engineering_microservices-network"
+      - "traefik.enable=false"
       - "consul.service.name=order-service"
       - "consul.service.port=3000"
       - "consul.service.tags=order,api,microservice"

@@ -53,7 +53,7 @@ http:
     order-strip-prefix:
       stripPrefix:
         prefixes:
-          - '/api/orders'
+          - '/order'
 
   routers:
     # Login Microservice router
