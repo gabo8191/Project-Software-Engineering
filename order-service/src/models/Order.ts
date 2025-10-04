@@ -36,7 +36,7 @@ const orderSchema = new Schema<IOrderDocument>({
   },
   orderID: {
     type: String,
-    required: [true, 'Order ID is required'],
+    required: false, // Will be auto-generated in pre-save middleware if not provided
     unique: true,
     trim: true,
     maxlength: [100, 'Order ID cannot exceed 100 characters']
