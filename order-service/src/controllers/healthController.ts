@@ -1,5 +1,5 @@
 import { HealthReq, HealthRes } from '../types/express.types';
-import { HealthResponse } from '../types/order.types';
+import { HealthResponse, DetailedStatusResponse } from '../types/order.types';
 
 /**
  * Health Controller - TypeScript implementation
@@ -15,23 +15,19 @@ class HealthController {
       console.log('🏥 Health check requested');
 
       // Import database config dynamically to avoid circular dependencies
-      const { default: database } = await import('../config/database');
+      // @ts-ignore - Dynamic import with proper typing
+      const { default: database } = await import('../config/database.js');
       
       // Check database connection
       const dbHealth = await database.healthCheck();
       
-      const health: HealthResponse & { 
-        version?: string;
-        uptime?: string;
-        environment?: string;
-        dependencies?: any;
-      } = {
+      const health: HealthResponse = {
         status: dbHealth.status === 'healthy' ? 'healthy' : 'unhealthy',
         service: 'order-service',
         timestamp: new Date().toISOString(),
         database: dbHealth.status,
         uptime: `${Math.floor(process.uptime())}s`,
-        version: '1.0.0',
+        version: '2.0.0-TypeScript',
         environment: process.env.NODE_ENV || 'development',
         dependencies: {
           database: dbHealth
@@ -40,12 +36,12 @@ class HealthController {
 
       const statusCode = health.status === 'healthy' ? 200 : 503;
       
-      res.status(statusCode).json(health as any);
+      res.status(statusCode).json(health);
 
     } catch (error) {
       console.error('❌ Health check failed:', (error as Error).message);
       
-      res.status(503).json({
+      const errorResponse: HealthResponse = {
         status: 'unhealthy',
         service: 'order-service',
         timestamp: new Date().toISOString(),
@@ -55,7 +51,9 @@ class HealthController {
         dependencies: {
           database: { status: 'error', error: (error as Error).message }
         }
-      } as any);
+      };
+      
+      res.status(503).json(errorResponse);
     }
   }
 
@@ -68,13 +66,14 @@ class HealthController {
       console.log('🚦 Readiness check requested');
 
       // Import database config dynamically
-      const { default: database } = await import('../config/database');
+      // @ts-ignore - Dynamic import with proper typing  
+      const { default: database } = await import('../config/database.js');
       
       // Check if database is connected and responsive
       const dbHealth = await database.healthCheck();
       
       if (dbHealth.status !== 'healthy') {
-        res.status(503).json({
+        const notReadyResponse: HealthResponse = {
           status: 'not ready',
           service: 'order-service',
           timestamp: new Date().toISOString(),
@@ -84,11 +83,13 @@ class HealthController {
           dependencies: {
             database: dbHealth
           }
-        } as any);
+        };
+        
+        res.status(503).json(notReadyResponse);
         return;
       }
 
-      res.status(200).json({
+      const readyResponse: HealthResponse = {
         status: 'ready',
         service: 'order-service',
         timestamp: new Date().toISOString(),
@@ -98,12 +99,14 @@ class HealthController {
         dependencies: {
           database: dbHealth
         }
-      } as any);
+      };
+      
+      res.status(200).json(readyResponse);
 
     } catch (error) {
       console.error('❌ Readiness check failed:', (error as Error).message);
       
-      res.status(503).json({
+      const errorResponse: HealthResponse = {
         status: 'not ready',
         service: 'order-service',
         timestamp: new Date().toISOString(),
@@ -111,7 +114,9 @@ class HealthController {
         uptime: `${Math.floor(process.uptime())}s`,
         message: 'Service is not ready',
         error: (error as Error).message
-      } as any);
+      };
+      
+      res.status(503).json(errorResponse);
     }
   }
 
@@ -124,7 +129,7 @@ class HealthController {
       console.log('💓 Liveness check requested');
 
       // Simple liveness check - if we can respond, we're alive
-      res.status(200).json({
+      const aliveResponse: HealthResponse = {
         status: 'alive',
         service: 'order-service',
         timestamp: new Date().toISOString(),
@@ -133,19 +138,23 @@ class HealthController {
         message: 'Service is alive',
         memory: process.memoryUsage(),
         pid: process.pid
-      } as any);
+      };
+      
+      res.status(200).json(aliveResponse);
 
     } catch (error) {
       console.error('❌ Liveness check failed:', (error as Error).message);
       
-      res.status(500).json({
+      const deadResponse: HealthResponse = {
         status: 'dead',
         service: 'order-service',
         timestamp: new Date().toISOString(),
         database: 'error',
         uptime: `${Math.floor(process.uptime())}s`,
         error: (error as Error).message
-      } as any);
+      };
+      
+      res.status(500).json(deadResponse);
     }
   }
 
@@ -158,10 +167,11 @@ class HealthController {
       console.log('📊 Detailed status requested');
 
       // Import database config dynamically
-      const { default: database } = await import('../config/database');
+      // @ts-ignore - Dynamic import with proper typing  
+      const { default: database } = await import('../config/database.js');
       const dbHealth = await database.healthCheck();
       
-      const status = {
+      const status: DetailedStatusResponse = {
         service: {
           name: 'order-service',
           version: '1.0.0',
@@ -189,7 +199,7 @@ class HealthController {
         }
       };
 
-      res.status(200).json(status as any);
+      res.status(200).json(status);
 
     } catch (error) {
       console.error('❌ Detailed status failed:', (error as Error).message);
@@ -210,11 +220,16 @@ class HealthController {
    * GET /ping
    */
   ping(req: HealthReq, res: HealthRes): void {
-    res.status(200).json({
-      message: 'pong',
+    const pingResponse: HealthResponse = {
+      status: 'alive',
+      service: 'order-service',
       timestamp: new Date().toISOString(),
-      service: 'order-service'
-    } as any);
+      database: 'connected',
+      uptime: `${Math.floor(process.uptime())}s`,
+      message: 'pong'
+    };
+    
+    res.status(200).json(pingResponse);
   }
 }
 

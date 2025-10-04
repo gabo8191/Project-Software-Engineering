@@ -53,9 +53,36 @@ export interface ValidationResult {
 
 export interface HealthResponse {
   status: string;
-  service: string | any;
+  service: string;
   timestamp: string;
   database: string;
   uptime: string;
-  [key: string]: any; // Allow additional properties for detailed status
+  version?: string;
+  environment?: string;
+  message?: string;
+  error?: string;
+  dependencies?: Record<string, any>;
+  memory?: NodeJS.MemoryUsage;
+  pid?: number;
+}
+
+export interface DetailedStatusResponse {
+  service: {
+    name: string;
+    version: string;
+    description: string;
+    status: string;
+    uptime: number;
+    timestamp: string;
+  };
+  system: {
+    node_version: string;
+    platform: NodeJS.Platform;
+    architecture: NodeJS.Architecture;
+    memory: NodeJS.MemoryUsage;
+    cpu: NodeJS.CpuUsage;
+    pid: number;
+  };
+  dependencies: Record<string, any>;
+  environment: Record<string, any>;
 }

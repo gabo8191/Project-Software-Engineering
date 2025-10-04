@@ -83,6 +83,15 @@ http:
         - security-headers
         - rate-limit
 
+    # Order service health endpoints
+    order-health:
+      rule: 'Host(`localhost`) && (Path(`/health`) || Path(`/ready`) || Path(`/live`) || Path(`/ping`) || Path(`/status`))'
+      service: 'order-service'
+      priority: 30
+      middlewares:
+        - cors
+        - security-headers
+
   services:
     # Login Microservice
     login-service:

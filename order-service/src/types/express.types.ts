@@ -8,7 +8,8 @@ import {
   CreateOrderRequest, 
   UpdateOrderRequest, 
   OrderResponse, 
-  HealthResponse 
+  HealthResponse,
+  DetailedStatusResponse
 } from './order.types';
 
 // Extend Express Request types for our specific endpoints
@@ -37,7 +38,7 @@ export type DeleteOrderReq = Request<{ orderID: string }>;
 export type DeleteOrderRes = TypedResponse<OrderResponse>;
 
 export type HealthReq = Request;
-export type HealthRes = TypedResponse<HealthResponse>;
+export type HealthRes = TypedResponse<HealthResponse | DetailedStatusResponse>;
 
 // Generic error response type
 export interface ErrorResponse {
