@@ -5,16 +5,19 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package*.json tsconfig.json ./
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install ALL dependencies (including dev dependencies for TypeScript build)
+RUN npm ci && npm cache clean --force
 
 # Copy source code
-COPY . .
+COPY src ./src
 
-# Build the application (if needed)
-# RUN npm run build
+# Build TypeScript to JavaScript
+RUN npm run build
+
+# Remove dev dependencies
+RUN npm ci --only=production && npm cache clean --force
 
 # Final stage
 FROM node:18-alpine
@@ -26,10 +29,10 @@ WORKDIR /app
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# Copy node_modules and source code from builder stage
+# Copy compiled JavaScript and node_modules from builder stage
+COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
-COPY . .
 
 # Change ownership to non-root user
 RUN chown -R nodejs:nodejs /app
@@ -44,5 +47,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
-# Run the application
-CMD ["node", "server.js"]
+# Run the compiled TypeScript application
+CMD ["node", "dist/server.js"]

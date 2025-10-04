@@ -59,7 +59,7 @@ services:
       timeout: 10s
       retries: 5
 
-  # Order Service (Node.js + Express + MongoDB)
+  # Order Service (TypeScript + Node.js + Express + MongoDB)
   order-service:
     build:
       context: ./order-service
