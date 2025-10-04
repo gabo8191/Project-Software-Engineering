@@ -64,7 +64,6 @@ http:
         - cors
         - security-headers
         - rate-limit
-        - login-strip-prefix
 
     # User Management Microservice router
     user-service:
