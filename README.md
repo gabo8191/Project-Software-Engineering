@@ -262,6 +262,7 @@ Project-Software-Engineering/
 └── README.md                 # Documentación del proyecto
 ```
 
+
 ### Configuración de Infraestructura
 
 #### Consul (Service Discovery)
