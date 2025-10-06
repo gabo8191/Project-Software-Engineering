@@ -16,51 +16,68 @@ class CustomerCRUD:
     """CRUD operations for Customer"""
 
     @staticmethod
-    def create_customer(db: Session, customer_data: CustomerCreateDTO) -> Optional[Customer]:
+    def create_customer(db: Session, customer_data) -> Optional[Customer]:
         """
         Create a new customer
         
         Args:
             db: Database session
-            customer_data: Customer data to create
+            customer_data: Customer data to create (dict or DTO)
             
         Returns:
             Customer object if successful, None if failed
         """
         try:
+            # Handle both dict and DTO input
+            if isinstance(customer_data, dict):
+                document = customer_data['document']
+                firstname = customer_data['firstname']
+                lastname = customer_data['lastname']
+                address = customer_data['address']
+                phone = customer_data['phone']
+                email = customer_data['email']
+            else:
+                # DTO object
+                document = customer_data.document
+                firstname = customer_data.firstname
+                lastname = customer_data.lastname
+                address = customer_data.address
+                phone = customer_data.phone
+                email = customer_data.email
+            
             # Check if customer already exists
             existing_customer = db.query(Customer).filter(
-                Customer.document == customer_data.document
+                Customer.document == document
             ).first()
             
             if existing_customer:
-                logger.warning(f"Customer with document {customer_data.document} already exists")
+                logger.warning(f"Customer with document {document} already exists")
                 return None
             
             # Check if email already exists
             existing_email = db.query(Customer).filter(
-                Customer.email == customer_data.email
+                Customer.email == email
             ).first()
             
             if existing_email:
-                logger.warning(f"Customer with email {customer_data.email} already exists")
+                logger.warning(f"Customer with email {email} already exists")
                 return None
             
             # Create new customer
             db_customer = Customer(
-                document=customer_data.document,
-                firstname=customer_data.firstname,
-                lastname=customer_data.lastname,
-                address=customer_data.address,
-                phone=customer_data.phone,
-                email=customer_data.email
+                document=document,
+                firstname=firstname,
+                lastname=lastname,
+                address=address,
+                phone=phone,
+                email=email
             )
             
             db.add(db_customer)
             db.commit()
             db.refresh(db_customer)
             
-            logger.info(f"Customer created successfully: {customer_data.document}")
+            logger.info(f"Customer created successfully: {document}")
             return db_customer
             
         except IntegrityError as e:

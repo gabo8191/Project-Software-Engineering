@@ -2,11 +2,11 @@
 SQLAlchemy models for Customer entity
 """
 from sqlalchemy import Column, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from datetime import datetime
 
-Base = declarative_base()
+# Import the shared Base from database config
+from app.core.database import Base
 
 
 class Customer(Base):

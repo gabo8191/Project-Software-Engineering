@@ -1,5 +1,6 @@
 import orderService from '../services/orderService';
 import validationService from '../services/validationService';
+import serviceClient from '../services/serviceClient';
 import {
   CreateOrderReq,
   CreateOrderRes,
@@ -39,8 +40,39 @@ class OrderController {
         return;
       }
 
+      // 🔍 INTER-SERVICE COMMUNICATION: Validate user exists
+      console.log('🔍 Validating user with user-service...');
+      const userValidation = await serviceClient.validateUser(validation.data.customerID);
+      
+      if (!userValidation.valid) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid customer ID - user not found',
+          errors: ['Customer validation failed']
+        });
+        return;
+      }
+
+      console.log('✅ User validation successful:', userValidation.user?.email || 'User found');
+
+      // Get user preferences for order processing
+      const userPreferences = await serviceClient.getUserPreferences(validation.data.customerID);
+      console.log('⚙️ User preferences loaded:', userPreferences);
+
       // Create order using service
       const result = await orderService.createOrder(validation.data);
+
+      // 📢 INTER-SERVICE COMMUNICATION: Notify user service about order creation
+      await serviceClient.notifyOrderCreated(
+        validation.data.customerID,
+        result.order.orderID || 'unknown',
+        {
+          customer_id: result.order.customerID,
+          order_id: result.order.orderID,
+          status: result.order.status,
+          created_at: result.order.createdAt
+        }
+      );
 
       res.status(201).json({
         success: true,
