@@ -398,8 +398,6 @@ A continuación se incluyen todas las capturas disponibles en la carpeta `Fotos 
 8.12 Captura 12  
 ![Captura 12 — Screenshot 2025-10-06 at 9.07.31 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%209.07.31%E2%80%AFAM.png)
 
-> Si la previsualización de alguna imagen falla por el carácter especial entre la hora y "AM", verifique en el visor Markdown del IDE o reemplace ese carácter por un espacio estándar en el nombre del archivo (o use el path ya codificado en este documento).
-
 ---
 
 ## 9. Operación y Mantenimiento
