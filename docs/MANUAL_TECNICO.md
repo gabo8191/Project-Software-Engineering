@@ -363,40 +363,40 @@ Set-Location ..
 A continuación se incluyen todas las capturas disponibles en la carpeta `Fotos Frontend/`. Los nombres de archivo se mantienen para trazabilidad.
 
 8.1 Captura 1  
-![Captura 1 — Screenshot 2025-10-06 at 8.43.26 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%208.43.26%E2%80%AFAM.png)
+![Captura 1 — Screenshot 2025-10-06 at 8.43.26 AM](../Fotos%20Frontend/Screenshot%202025-10-06%20at%208.43.26%E2%80%AFAM.png)
 
 8.2 Captura 2  
-![Captura 2 — Screenshot 2025-10-06 at 8.43.40 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%208.43.40%E2%80%AFAM.png)
+![Captura 2 — Screenshot 2025-10-06 at 8.43.40 AM](../Fotos%20Frontend/Screenshot%202025-10-06%20at%208.43.40%E2%80%AFAM.png)
 
 8.3 Captura 3  
-![Captura 3 — Screenshot 2025-10-06 at 8.43.46 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%208.43.46%E2%80%AFAM.png)
+![Captura 3 — Screenshot 2025-10-06 at 8.43.46 AM](../Fotos%20Frontend/Screenshot%202025-10-06%20at%208.43.46%E2%80%AFAM.png)
 
 8.4 Captura 4  
-![Captura 4 — Screenshot 2025-10-06 at 8.43.53 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%208.43.53%E2%80%AFAM.png)
+![Captura 4 — Screenshot 2025-10-06 at 8.43.53 AM](../Fotos%20Frontend/Screenshot%202025-10-06%20at%208.43.53%E2%80%AFAM.png)
 
 8.5 Captura 5  
-![Captura 5 — Screenshot 2025-10-06 at 8.44.06 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%208.44.06%E2%80%AFAM.png)
+![Captura 5 — Screenshot 2025-10-06 at 8.44.06 AM](../Fotos%20Frontend/Screenshot%202025-10-06%20at%208.44.06%E2%80%AFAM.png)
 
 8.6 Captura 6  
-![Captura 6 — Screenshot 2025-10-06 at 8.44.13 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%208.44.13%E2%80%AFAM.png)
+![Captura 6 — Screenshot 2025-10-06 at 8.44.13 AM](../Fotos%20Frontend/Screenshot%202025-10-06%20at%208.44.13%E2%80%AFAM.png)
 
 8.7 Captura 7  
-![Captura 7 — Screenshot 2025-10-06 at 8.44.20 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%208.44.20%E2%80%AFAM.png)
+![Captura 7 — Screenshot 2025-10-06 at 8.44.20 AM](../Fotos%20Frontend/Screenshot%202025-10-06%20at%208.44.20%E2%80%AFAM.png)
 
 8.8 Captura 8  
-![Captura 8 — Screenshot 2025-10-06 at 8.44.27 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%208.44.27%E2%80%AFAM.png)
+![Captura 8 — Screenshot 2025-10-06 at 8.44.27 AM](../Fotos%20Frontend/Screenshot%202025-10-06%20at%208.44.27%E2%80%AFAM.png)
 
 8.9 Captura 9  
-![Captura 9 — Screenshot 2025-10-06 at 8.44.37 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%208.44.37%E2%80%AFAM.png)
+![Captura 9 — Screenshot 2025-10-06 at 8.44.37 AM](../Fotos%20Frontend/Screenshot%202025-10-06%20at%208.44.37%E2%80%AFAM.png)
 
 8.10 Captura 10  
-![Captura 10 — Screenshot 2025-10-06 at 8.44.44 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%208.44.44%E2%80%AFAM.png)
+![Captura 10 — Screenshot 2025-10-06 at 8.44.44 AM](../Fotos%20Frontend/Screenshot%202025-10-06%20at%208.44.44%E2%80%AFAM.png)
 
 8.11 Captura 11  
-![Captura 11 — Screenshot 2025-10-06 at 9.07.15 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%209.07.15%E2%80%AFAM.png)
+![Captura 11 — Screenshot 2025-10-06 at 9.07.15 AM](../Fotos%20Frontend/Screenshot%202025-10-06%20at%209.07.15%E2%80%AFAM.png)
 
 8.12 Captura 12  
-![Captura 12 — Screenshot 2025-10-06 at 9.07.31 AM](Fotos%20Frontend/Screenshot%202025-10-06%20at%209.07.31%E2%80%AFAM.png)
+![Captura 12 — Screenshot 2025-10-06 at 9.07.31 AM](../Fotos%20Frontend/Screenshot%202025-10-06%20at%209.07.31%E2%80%AFAM.png)
 
 ---
 
