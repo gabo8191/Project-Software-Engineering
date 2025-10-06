@@ -111,13 +111,13 @@ const config: AppConfig = {
     credentials: true
   },
 
-  // Rate limiting
+  // Rate limiting - More reasonable limits for microservices
   rateLimit: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: parseInt(process.env.RATE_LIMIT_REQUESTS_PER_MINUTE || '100'),
+    windowMs: 60 * 1000, // 1 minute window
+    max: parseInt(process.env.RATE_LIMIT_REQUESTS_PER_MINUTE || '1000'), // 1000 requests per minute (much more reasonable)
     message: {
       error: 'Too many requests from this IP, please try again later.',
-      retryAfter: '15 minutes'
+      retryAfter: '1 minute'
     }
   },
 

@@ -17,7 +17,8 @@ class ConsulService {
     this.serviceName = process.env.SERVICE_NAME || 'order-service';
     this.servicePort = parseInt(process.env.SERVICE_PORT || '3000');
     this.serviceHost = process.env.SERVICE_HOST || 'order-service';
-    this.serviceId = `${this.serviceName}-${Date.now()}`;
+    // Use static service ID to prevent multiple registrations
+    this.serviceId = `${this.serviceName}-${this.servicePort}`;
     
     console.log('🔍 Consul service initialized for order-service');
   }
@@ -95,6 +96,14 @@ class ConsulService {
    */
   async registerService(): Promise<void> {
     try {
+      // First, try to deregister any existing service with the same ID
+      try {
+        await this.deregisterService();
+      } catch (error) {
+        // Ignore deregistration errors, service might not exist
+        console.log(`ℹ️  Previous service instance not found (this is normal): ${this.serviceId}`);
+      }
+
       const registration = {
         ID: this.serviceId,
         Name: this.serviceName,
@@ -104,7 +113,8 @@ class ConsulService {
         Check: {
           HTTP: `http://${this.serviceHost}:${this.servicePort}/health`,
           Interval: '30s',
-          Timeout: '10s'
+          Timeout: '10s',
+          DeregisterCriticalServiceAfter: '60s'
         }
       };
 

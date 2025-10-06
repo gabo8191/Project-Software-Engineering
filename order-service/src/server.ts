@@ -103,13 +103,18 @@ class OrderServiceApp {
       credentials: config.cors.credentials
     }));
 
-    // Rate limiting middleware
+    // Rate limiting middleware - exclude health check endpoints
     const limiter = rateLimit({
       windowMs: config.rateLimit.windowMs,
       max: config.rateLimit.max,
       message: config.rateLimit.message,
       standardHeaders: true,
-      legacyHeaders: false
+      legacyHeaders: false,
+      // Skip rate limiting for health check endpoints
+      skip: (req) => {
+        const healthEndpoints = ['/health', '/ready', '/live', '/status', '/ping'];
+        return healthEndpoints.some(endpoint => req.path === endpoint || req.path.endsWith(endpoint));
+      }
     });
     this.app.use(limiter);
 
