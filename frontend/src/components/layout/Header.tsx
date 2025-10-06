@@ -17,24 +17,22 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 z-30">
-      <div className="flex items-center min-w-0">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onMenuClick}
-          className="3xl:hidden mr-3 flex-shrink-0"
-        >
-          <Menu size={20} />
-        </Button>
-        
-        <div className="flex items-center min-w-0">
-          <Package className="h-6 w-6 text-primary-600 flex-shrink-0" />
-          <span className="ml-2 text-lg font-semibold text-gray-900 truncate">OrderFlow</span>
+    <header className="bg-white border-b border-gray-200">
+      <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center">
+          <button
+            onClick={onMenuClick}
+            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 mr-2 3xl:hidden"
+          >
+            <Menu size={20} />
+          </button>
+          <div className="flex items-center 3xl:hidden">
+            <Package className="h-6 w-6 text-primary-600" />
+            <span className="ml-2 text-xl font-semibold text-gray-900">OrderFlow</span>
+          </div>
         </div>
-      </div>
 
-      <div className="flex items-center space-x-2 flex-shrink-0">
+        <div className="flex items-center space-x-2 flex-shrink-0">
         {/* Notifications */}
         <Button variant="outline" size="sm" className="relative hidden sm:flex">
           <Bell size={18} />
@@ -77,6 +75,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               </button>
             </div>
           )}
+        </div>
         </div>
       </div>
     </header>

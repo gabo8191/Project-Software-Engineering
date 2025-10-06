@@ -41,7 +41,7 @@ async def create_customer(customer_data: dict, db: Session = Depends(get_db)):
                     detail=f"Field '{field}' is required"
                 )
         
-        # Check if customer already exists
+        # Check if customer already exists by document
         existing_customer = customer_crud.get_customer_by_id(db, customer_data['document'])
         if existing_customer:
             raise HTTPException(
@@ -49,8 +49,23 @@ async def create_customer(customer_data: dict, db: Session = Depends(get_db)):
                 detail=f"Customer with document {customer_data['document']} already exists"
             )
         
+        # Check if email already exists
+        existing_email = customer_crud.get_customer_by_email(db, customer_data['email'])
+        if existing_email:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Customer with email {customer_data['email']} already exists"
+            )
+        
         # Create the customer
         new_customer = customer_crud.create_customer(db, customer_data)
+        
+        # Verify creation was successful
+        if not new_customer:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create customer"
+            )
         
         logger.info(f"Customer created successfully: {new_customer.document}")
         return {
@@ -211,15 +226,17 @@ async def get_all_customers(
     Get all customers with pagination - REAL IMPLEMENTATION
     """
     try:
-        logger.info(f"Getting all customers from database (skip={skip}, limit={limit})")
+        logger.info(f"🔍 Getting all customers from database (skip={skip}, limit={limit})")
+        logger.info(f"🔍 Database session: {db}")
         
         # Get customers from database using CRUD
         customers = customer_crud.get_all_customers(db, skip=skip, limit=limit)
+        logger.info(f"🔍 Raw customers from CRUD: {customers}")
         
         # Convert to dict format
         customers_list = []
         for customer in customers:
-            customers_list.append({
+            customer_dict = {
                 "document": customer.document,
                 "firstname": customer.firstname,
                 "lastname": customer.lastname,
@@ -228,13 +245,19 @@ async def get_all_customers(
                 "email": customer.email,
                 "created_at": customer.created_at.isoformat() if customer.created_at else None,
                 "updated_at": customer.updated_at.isoformat() if customer.updated_at else None
-            })
+            }
+            customers_list.append(customer_dict)
+            logger.info(f"🔍 Added customer to list: {customer_dict}")
         
-        logger.info(f"Retrieved {len(customers_list)} customers from database")
+        logger.info(f"✅ Retrieved {len(customers_list)} customers from database")
+        logger.info(f"🔍 Final customers list: {customers_list}")
         return customers_list
         
     except Exception as e:
-        logger.error(f"Error in get_all_customers endpoint: {e}")
+        logger.error(f"❌ Error in get_all_customers endpoint: {e}")
+        logger.error(f"❌ Exception type: {type(e)}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
         # Return empty list instead of failing
         return []
 

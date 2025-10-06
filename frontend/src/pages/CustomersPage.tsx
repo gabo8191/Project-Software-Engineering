@@ -14,6 +14,9 @@ const CustomersPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     firstname: '',
@@ -94,6 +97,101 @@ const CustomersPage: React.FC = () => {
     } catch (error: any) {
       console.error('❌ Error creating user:', error);
       setError(error.message || 'Error creating user');
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleEditCustomer = (customer: User) => {
+    setSelectedCustomer(customer);
+    setFormData({
+      email: customer.email,
+      firstname: customer.first_name || '',
+      lastname: customer.last_name || '',
+      document: customer.id,
+      address: '', // These fields might not be available in the current user structure
+      phone: ''
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdateCustomer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCustomer) return;
+
+    try {
+      setFormLoading(true);
+      setError(null);
+      
+      console.log('🔄 Updating user in user-service...');
+      
+      const updateData = {
+        email: formData.email,
+        first_name: formData.firstname,
+        last_name: formData.lastname,
+      };
+      
+      const response = await userService.updateUser(selectedCustomer.id, updateData);
+      
+      if (response.success) {
+        console.log('✅ User updated successfully');
+        
+        // Reset form and close modal
+        setFormData({
+          email: '',
+          firstname: '',
+          lastname: '',
+          document: '',
+          address: '',
+          phone: ''
+        });
+        setSelectedCustomer(null);
+        setShowEditModal(false);
+        
+        // Reload users
+        await loadCustomers();
+      } else {
+        setError(response.message || 'Error updating user');
+      }
+    } catch (error: any) {
+      console.error('❌ Error updating user:', error);
+      setError(error.message || 'Error updating user');
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleDeleteCustomer = (customer: User) => {
+    setSelectedCustomer(customer);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteCustomer = async () => {
+    if (!selectedCustomer) return;
+
+    try {
+      setFormLoading(true);
+      setError(null);
+      
+      console.log('🗑️ Deleting user in user-service...');
+      
+      const response = await userService.deleteUser(selectedCustomer.id);
+      
+      if (response.success) {
+        console.log('✅ User deleted successfully');
+        
+        // Close modal and reset
+        setSelectedCustomer(null);
+        setShowDeleteModal(false);
+        
+        // Reload users
+        await loadCustomers();
+      } else {
+        setError(response.message || 'Error deleting user');
+      }
+    } catch (error: any) {
+      console.error('❌ Error deleting user:', error);
+      setError(error.message || 'Error deleting user');
     } finally {
       setFormLoading(false);
     }
@@ -226,10 +324,18 @@ const CustomersPage: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex items-center gap-2">
-                              <button className="text-blue-600 hover:text-blue-800">
+                              <button 
+                                onClick={() => handleEditCustomer(customer)}
+                                className="text-blue-600 hover:text-blue-800"
+                                title="Edit user"
+                              >
                                 <Edit size={16} />
                               </button>
-                              <button className="text-red-600 hover:text-red-800">
+                              <button 
+                                onClick={() => handleDeleteCustomer(customer)}
+                                className="text-red-600 hover:text-red-800"
+                                title="Delete user"
+                              >
                                 <Trash2 size={16} />
                               </button>
                             </div>
@@ -322,6 +428,118 @@ const CustomersPage: React.FC = () => {
                   </Button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && selectedCustomer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg w-full max-w-md">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Edit User</h2>
+              
+              <form onSubmit={handleUpdateCustomer} className="space-y-4">
+                <Input
+                  label="Email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="user@example.com"
+                />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    label="First Name"
+                    type="text"
+                    value={formData.firstname}
+                    onChange={(e) => setFormData({ ...formData, firstname: e.target.value })}
+                    placeholder="John"
+                  />
+                  
+                  <Input
+                    label="Last Name"
+                    type="text"
+                    value={formData.lastname}
+                    onChange={(e) => setFormData({ ...formData, lastname: e.target.value })}
+                    placeholder="Doe"
+                  />
+                </div>
+                
+                <div className="flex gap-4 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowEditModal(false);
+                      setSelectedCustomer(null);
+                      setFormData({
+                        email: '',
+                        firstname: '',
+                        lastname: '',
+                        document: '',
+                        address: '',
+                        phone: ''
+                      });
+                    }}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={formLoading}
+                    className="flex-1"
+                  >
+                    {formLoading ? 'Updating...' : 'Update User'}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && selectedCustomer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg w-full max-w-md">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold mb-4 text-red-600">Delete User</h2>
+              
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete user{' '}
+                <span className="font-semibold">
+                  {selectedCustomer.first_name && selectedCustomer.last_name
+                    ? `${selectedCustomer.first_name} ${selectedCustomer.last_name}`
+                    : selectedCustomer.email}
+                </span>
+                ? This action cannot be undone.
+              </p>
+              
+              <div className="flex gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setSelectedCustomer(null);
+                  }}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  onClick={confirmDeleteCustomer}
+                  disabled={formLoading}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                >
+                  {formLoading ? 'Deleting...' : 'Delete User'}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

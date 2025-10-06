@@ -27,6 +27,8 @@ export interface UpdateUserRequest {
   first_name?: string;
   last_name?: string;
   is_active?: boolean;
+  address?: string;
+  phone?: string;
 }
 
 export interface UserResponse {
@@ -161,19 +163,88 @@ export const userService = {
     try {
       console.log('🔄 Updating user:', userId, userData);
       
-      const response = await api.put<User>(`${SERVICE_URLS.USER_SERVICE}${API_ENDPOINTS.user.updateUser}/${userId}`, userData);
+      // Convert UpdateUserRequest to customer update format - only include non-empty fields
+      const customerData: any = {};
+      
+      if (userData.first_name) customerData.firstname = userData.first_name;
+      if (userData.last_name) customerData.lastname = userData.last_name;
+      if (userData.email) customerData.email = userData.email;
+      if (userData.address) customerData.address = userData.address;
+      if (userData.phone) customerData.phone = userData.phone;
+      
+      console.log('📝 Sending customer data:', customerData);
+      
+      const response = await api.put(
+        `${SERVICE_URLS.USER_SERVICE}${API_ENDPOINTS.user.updateUser}?customerid=${userId}`,
+        customerData
+      );
+      
+      console.log('✅ Update response:', response.data);
       
       return {
-        success: true,
-        message: 'User updated successfully',
-        user: response.data
+        success: response.data.updateCustomerValid || false,
+        message: response.data.updateCustomerValid ? 'User updated successfully' : 'Failed to update user'
       };
     } catch (error: any) {
       console.error('❌ Error updating user:', error);
+      console.error('❌ Error response:', error.response?.data);
+      
+      // Handle specific error cases
+      let errorMessage = 'Error updating user';
+      
+      if (error.response?.status === 422) {
+        // Validation error - handle array of validation errors
+        if (error.response.data?.detail && Array.isArray(error.response.data.detail)) {
+          const validationErrors = error.response.data.detail.map((err: any) => err.msg).join(', ');
+          errorMessage = `Validation error: ${validationErrors}`;
+        } else {
+          errorMessage = 'Validation error - please check your input';
+        }
+      } else if (error.response?.status === 409) {
+        // Conflict - email or document already exists
+        errorMessage = error.response.data?.detail || 'User with this email or document already exists';
+      } else if (error.response?.status === 400) {
+        // Bad request - missing required fields
+        errorMessage = error.response.data?.detail || 'Missing required fields';
+      } else if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
       
       return {
         success: false,
-        message: error.response?.data?.detail || 'Error updating user'
+        message: errorMessage
+      };
+    }
+  },
+
+  /**
+   * Delete user by ID
+   */
+  deleteUser: async (userId: string): Promise<UserResponse> => {
+    try {
+      console.log('🗑️ Deleting user:', userId);
+      
+      const response = await api.delete(`${SERVICE_URLS.USER_SERVICE}${API_ENDPOINTS.user.deleteUser}/${userId}`);
+      
+      return {
+        success: true,
+        message: response.data.message || 'User deleted successfully'
+      };
+    } catch (error: any) {
+      console.error('❌ Error deleting user:', error);
+      
+      if (error.response?.status === 404) {
+        return {
+          success: false,
+          message: 'User not found'
+        };
+      }
+      
+      return {
+        success: false,
+        message: error.response?.data?.detail || error.response?.data?.message || 'Error deleting user'
       };
     }
   },
