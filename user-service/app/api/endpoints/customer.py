@@ -204,43 +204,38 @@ async def delete_customer(
 @router.get("/customers")
 async def get_all_customers(
     skip: int = 0,
-    limit: int = 100
+    limit: int = 100,
+    db: Session = Depends(get_db)
 ):
     """
-    Get all customers with pagination - SUPER SIMPLIFIED VERSION
+    Get all customers with pagination - REAL IMPLEMENTATION
     """
     try:
-        logger.info(f"Getting all customers (skip={skip}, limit={limit})")
+        logger.info(f"Getting all customers from database (skip={skip}, limit={limit})")
         
-        # Return simple dict objects instead of DTOs
-        fake_customers = [
-            {
-                "document": "12345678",
-                "firstname": "Juan",
-                "lastname": "Pérez",
-                "address": "Calle 123 #45-67, Bogotá",
-                "phone": "+57 300 123 4567",
-                "email": "juan.perez@email.com",
-                "created_at": "2025-10-05T19:00:00Z",
-                "updated_at": "2025-10-05T19:00:00Z"
-            },
-            {
-                "document": "87654321",
-                "firstname": "María",
-                "lastname": "García",
-                "address": "Carrera 15 #23-45, Medellín",
-                "phone": "+57 300 555 1234",
-                "email": "maria.garcia@email.com",
-                "created_at": "2025-10-05T19:00:00Z",
-                "updated_at": "2025-10-05T19:00:00Z"
-            }
-        ]
+        # Get customers from database using CRUD
+        customers = customer_crud.get_all_customers(db, skip=skip, limit=limit)
         
-        logger.info(f"Retrieved {len(fake_customers)} fake customers")
-        return fake_customers
+        # Convert to dict format
+        customers_list = []
+        for customer in customers:
+            customers_list.append({
+                "document": customer.document,
+                "firstname": customer.firstname,
+                "lastname": customer.lastname,
+                "address": customer.address,
+                "phone": customer.phone,
+                "email": customer.email,
+                "created_at": customer.created_at.isoformat() if customer.created_at else None,
+                "updated_at": customer.updated_at.isoformat() if customer.updated_at else None
+            })
+        
+        logger.info(f"Retrieved {len(customers_list)} customers from database")
+        return customers_list
         
     except Exception as e:
         logger.error(f"Error in get_all_customers endpoint: {e}")
+        # Return empty list instead of failing
         return []
 
 

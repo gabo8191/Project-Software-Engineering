@@ -91,3 +91,34 @@ func (c *ConsulService) WaitForConsul(maxRetries int, retryInterval time.Duratio
 
 	return fmt.Errorf("Consul not available after %d retries", maxRetries)
 }
+
+// DiscoverService discovers a healthy service by name
+func (c *ConsulService) DiscoverService(serviceName string) (*ServiceInfo, error) {
+	services, _, err := c.client.Health().Service(serviceName, "", true, nil) // Only passing services
+	if err != nil {
+		return nil, fmt.Errorf("failed to discover service %s: %w", serviceName, err)
+	}
+
+	if len(services) == 0 {
+		return nil, fmt.Errorf("no healthy instances of service %s found", serviceName)
+	}
+
+	// Return the first healthy service
+	service := services[0].Service
+	return &ServiceInfo{
+		Name:    service.Service,
+		Address: service.Address,
+		Port:    service.Port,
+		Tags:    service.Tags,
+		URL:     fmt.Sprintf("http://%s:%d", service.Address, service.Port),
+	}, nil
+}
+
+// ServiceInfo holds discovered service information
+type ServiceInfo struct {
+	Name    string   `json:"name"`
+	Address string   `json:"address"`
+	Port    int      `json:"port"`
+	Tags    []string `json:"tags"`
+	URL     string   `json:"url"`
+}
