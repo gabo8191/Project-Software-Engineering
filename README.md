@@ -73,6 +73,11 @@ docker-compose up -d
 docker-compose ps
 ```
 
+> 🎯 **Configuración Automática**: El sistema se configura automáticamente al iniciar:
+> - Las tablas de PostgreSQL se crean automáticamente en el primer inicio
+> - Los servicios se registran automáticamente en Consul para service discovery
+> - Traefik configura las rutas dinámicamente basado en los servicios disponibles
+
 #### 4. Verificar el Estado de los Servicios
 
 ```bash
@@ -87,6 +92,54 @@ docker-compose logs -f login-service
 ```
 
 > 📋 **Nota**: Los servicios pueden tardar unos minutos en estar completamente disponibles debido a los health checks y la inicialización de las bases de datos.
+
+## 🔄 Comunicación Inter-Servicios
+
+Este proyecto implementa **comunicación real entre microservicios** usando Consul para service discovery y HTTP para las llamadas entre servicios.
+
+### Ejemplo de Flujo Inter-Servicios
+
+Cuando se crea una nueva orden, el sistema ejecuta el siguiente flujo:
+
+```mermaid
+sequenceDiagram
+    participant Frontend
+    participant API Gateway
+    participant Order Service
+    participant User Service
+    participant PostgreSQL
+    participant MongoDB
+
+    Frontend->>API Gateway: POST /order/createorder
+    API Gateway->>Order Service: Route request
+    Order Service->>User Service: GET /customer/findcustomerbyid?customerid=123
+    User Service->>PostgreSQL: Query customer
+    PostgreSQL-->>User Service: Customer data or 404
+    User Service-->>Order Service: Validation response
+    alt Customer exists
+        Order Service->>MongoDB: Create order
+        MongoDB-->>Order Service: Order created
+        Order Service-->>API Gateway: Success response
+    else Customer not found
+        Order Service-->>API Gateway: Validation error
+    end
+    API Gateway-->>Frontend: Final response
+```
+
+### Características de la Comunicación
+
+- **Service Discovery**: Los servicios se descubren automáticamente usando Consul
+- **Validación de Datos**: Order-service valida que los customers existan antes de crear órdenes
+- **Tolerancia a Fallos**: Los servicios manejan errores de comunicación gracefully
+- **Logging Distribuido**: Cada llamada inter-servicio se registra para debugging
+
+### Endpoints de Comunicación Interna
+
+| Servicio Origen | Servicio Destino | Endpoint | Propósito |
+|----------------|------------------|----------|-----------|
+| Order Service  | User Service     | `/customer/findcustomerbyid` | Validar customer antes de crear orden |
+| Order Service  | User Service     | `/customer/preferences` | Obtener preferencias del usuario |
+| Login Service  | User Service     | `/customer/authenticate` | Validar credenciales |
 
 ## 📊 Servicios y Puertos
 
@@ -109,11 +162,38 @@ docker-compose logs -f login-service
 
 ### Rutas a través del API Gateway
 
-Todas las peticiones a los microservicios deben realizarse a través del API Gateway:
+**⚠️ IMPORTANTE**: Todas las peticiones a los microservicios deben realizarse a través del API Gateway en el puerto 8090. No acceder directamente a los puertos de los servicios.
 
-- **Login API**: `http://localhost:8090/login/*`
-- **User API**: `http://localhost:8090/customer/*`
-- **Order API**: `http://localhost:8090/order/*`
+| API | URL de Acceso | Descripción |
+|-----|---------------|-------------|
+| **Login API** | `http://localhost:8090/login/*` | Autenticación y gestión de sesiones |
+| **Customer API** | `http://localhost:8090/customer/*` | Gestión de clientes y usuarios |
+| **Order API** | `http://localhost:8090/order/*` | Gestión de órdenes y pedidos |
+
+#### Ejemplos de Uso del API Gateway
+
+```bash
+# Crear un customer
+curl -X POST "http://localhost:8090/customer/createcustomer" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "document": "12345678",
+    "firstname": "Juan",
+    "lastname": "Pérez",
+    "email": "juan@example.com",
+    "address": "Calle 123",
+    "phone": "555-0123"
+  }'
+
+# Crear una orden (valida automáticamente que el customer exista)
+curl -X POST "http://localhost:8090/order/createorder" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerID": "12345678",
+    "products": [{"name": "Product 1", "quantity": 2, "price": 25.99}],
+    "status": "Received"
+  }'
+```
 
 ## 🗄️ Bases de Datos
 

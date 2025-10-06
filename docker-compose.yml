@@ -51,11 +51,11 @@ services:
       file: docker-compose.services.yml
       service: login-service
 
-  # User Service (Python + FastAPI + PostgreSQL) - READY ✅
-  user-service:
+  # Customer Service (Python + Flask) - READY ✅
+  customer-service:
     extends:
       file: docker-compose.services.yml
-      service: user-service
+      service: customer-service
 
   # Order Service (Node.js + Express + MongoDB) - READY ✅
   order-service:
@@ -63,11 +63,43 @@ services:
       file: docker-compose.services.yml
       service: order-service
 
+  # User Service (Python + FastAPI + PostgreSQL) - READY ✅
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-UserDB}
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - SERVICE_NAME=user-service
+      - SERVICE_PORT=8000
+      - SERVICE_HOST=user-service
+    labels:
+      - "traefik.enable=false"
+      - "consul.service.name=user-service"
+      - "consul.service.port=8000"
+      - "consul.service.tags=user,api,microservice"
+    ports:
+      - "8000:8000"
+    networks:
+      - microservices-network
+    depends_on:
+      consul:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   # ===========================================
   # FRONTEND
-  # ===========================================
-
-  # Frontend (Angular + Nginx) - NOT READY YET
+  # ===========================================   # Frontend (Angular + Nginx) - NOT READY YET
   # frontend:
   #   extends:
   #     file: docker-compose.frontend.yml

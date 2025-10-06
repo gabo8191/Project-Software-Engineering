@@ -43,11 +43,11 @@ http:
         prefixes:
           - '/login'
 
-    # User service middleware
-    user-strip-prefix:
+    # Customer service middleware
+    customer-strip-prefix:
       stripPrefix:
         prefixes:
-          - '/api/users'
+          - '/customer'
 
     # Order service middleware
     order-strip-prefix:
@@ -65,10 +65,10 @@ http:
         - security-headers
         - rate-limit
 
-    # User Management Microservice router
-    user-service:
+    # Customer Management Microservice router
+    customer-service:
       rule: 'PathPrefix(`/customer`)'
-      service: 'user-service'
+      service: 'customer-service'
       middlewares:
         - cors
         - security-headers
@@ -82,15 +82,8 @@ http:
         - cors
         - security-headers
         - rate-limit
-
-    # Order service health endpoints
-    order-health:
-      rule: 'Host(`localhost`) && (Path(`/health`) || Path(`/ready`) || Path(`/live`) || Path(`/ping`) || Path(`/status`))'
-      service: 'order-service'
-      priority: 30
-      middlewares:
-        - cors
-        - security-headers
+        - order-strip-prefix
+        - order-strip-prefix
 
   services:
     # Login Microservice
@@ -99,8 +92,8 @@ http:
         servers:
           - url: 'http://login-service:8081'
 
-    # User Management Microservice
-    user-service:
+    # Customer Management Microservice
+    customer-service:
       loadBalancer:
         servers:
           - url: 'http://user-service:8000'

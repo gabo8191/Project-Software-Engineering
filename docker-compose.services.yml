@@ -34,27 +34,27 @@ services:
       timeout: 10s
       retries: 5
 
-  # User Service (Python + FastAPI + PostgreSQL)
-  user-service:
+  # Customer Service Simple (Python + Flask)
+  customer-service:
     build:
-      context: ./user-service
+      context: ./customer-service-simple
       dockerfile: Dockerfile
-    container_name: user-service
+    container_name: customer-service
     restart: unless-stopped
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres_user}:${POSTGRES_PASSWORD:-postgres_password_123}@postgres:5432/${POSTGRES_DB:-customerdb}
-      - CONSUL_HOST=consul
-      - CONSUL_PORT=8500
-      - SERVICE_NAME=user-service
-      - SERVICE_PORT=8000
+      - SERVICE_NAME=customer-service
+      - SERVICE_PORT=3000
     labels:
       - "traefik.enable=false"
+      - "consul.service.name=customer-service"
+      - "consul.service.port=3000"
+      - "consul.service.tags=customer,api,microservice"
     ports:
-      - "8000:8000"
+      - "3001:3000"
     networks:
       - microservices-network
     healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 5

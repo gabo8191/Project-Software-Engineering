@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import orderRoutes from './orderRoutes';
 import healthRoutes from './healthRoutes';
+import testRoutes from './testRoutes';
 
 const router = express.Router();
 
@@ -12,8 +13,11 @@ const router = express.Router();
 // Health and monitoring endpoints
 router.use('/', healthRoutes);
 
-// Order management endpoints
-router.use('/order', orderRoutes);
+// Order management endpoints (without /order prefix since Traefik strips it)
+router.use('/', orderRoutes);
+
+// Service communication test endpoints
+router.use('/test', testRoutes);
 
 // API Documentation endpoint
 router.get('/', (req: Request, res: Response) => {
@@ -38,6 +42,13 @@ router.get('/', (req: Request, res: Response) => {
         'GET /order/getallorders': 'Get all orders with pagination',
         'DELETE /order/deleteorder/:orderID': 'Delete order by ID',
         'GET /order/stats': 'Get order statistics'
+      },
+      test: {
+        'GET /test/services/health': 'Test all services health',
+        'GET /test/user-service/:userId': 'Test user service connection',
+        'POST /test/login-service': 'Test login service connection',
+        'GET /test/user-preferences/:userId': 'Test user preferences',
+        'POST /test/order-workflow': 'Test complete order workflow'
       }
     },
     technologies: {
@@ -72,7 +83,12 @@ router.use('*', (req: Request, res: Response) => {
       'GET /order/getorderbyid/:orderID',
       'GET /order/getallorders',
       'DELETE /order/deleteorder/:orderID',
-      'GET /order/stats'
+      'GET /order/stats',
+      'GET /test/services/health',
+      'GET /test/user-service/:userId',
+      'POST /test/login-service',
+      'GET /test/user-preferences/:userId',
+      'POST /test/order-workflow'
     ]
   });
 });

@@ -196,9 +196,9 @@ class OrderServiceApp {
     console.log('🔍 Setting up Consul service discovery...');
     
     try {
-      // Dynamic import for Consul service (JS file)
-      // @ts-ignore - Legacy JS module, no types available
-      const { default: consulService } = await import('./services/consulService.js');
+      // Import Consul service (TypeScript)
+      const consulServiceModule = await import('./services/consulService');
+      const consulService = consulServiceModule.default;
       
       // Wait for Consul to be available
       await consulService.waitForConsul(10, 2);

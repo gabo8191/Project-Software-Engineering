@@ -52,9 +52,19 @@ def create_tables():
         # Import all models to ensure they are registered
         from app.models.customer import Customer
         
+        logger.info(f"Registered models in Base.metadata: {list(Base.metadata.tables.keys())}")
+        
         # Create all tables
         Base.metadata.create_all(bind=engine)
+        
+        # Verify tables were created
+        with engine.connect() as connection:
+            result = connection.execute(text("SELECT tablename FROM pg_tables WHERE schemaname = 'public'"))
+            existing_tables = [row[0] for row in result.fetchall()]
+            logger.info(f"Tables in database after creation: {existing_tables}")
+        
         logger.info("Database tables created successfully")
+        
     except Exception as e:
         logger.error(f"Error creating database tables: {e}")
         raise
